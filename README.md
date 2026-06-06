@@ -1,4 +1,4 @@
-# Assignment 2 - Stolen Model Detection
+# Assignment 3 - Robustness
 
 Detect whether given suspect models are stolen versions of a target model.
 
