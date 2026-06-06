@@ -1,0 +1,54 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+submission.csv
+weighted_score_exp.csv
+weight_features.csv
+/suspect_models/
+/target_model/
+.env
+models/
+outputs_stagewise/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Build and packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Logs and local runtime files
+*.log
+*.tmp
+runlogs/
+
+# Editor/IDE settings
+.vscode/
+.idea/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+data/
+
+# removing model and data files
+model.pt
+priv.pt
+pub.pt
+shadow_checkpoints/
+
+# ignore mia.sub for cluster
+mia.sub
+
+~$weighted_score_exp.xlsx
