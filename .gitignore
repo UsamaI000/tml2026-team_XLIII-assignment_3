@@ -8,13 +8,9 @@ __pycache__/
 venv/
 env/
 submission.csv
-weighted_score_exp.csv
-weight_features.csv
-/suspect_models/
-/target_model/
+train.npz
 .env
 models/
-outputs_stagewise/
 
 # Tooling caches
 .pytest_cache/
@@ -51,4 +47,4 @@ shadow_checkpoints/
 # ignore mia.sub for cluster
 mia.sub
 
-~$weighted_score_exp.xlsx
+~$Experiments.xlsx

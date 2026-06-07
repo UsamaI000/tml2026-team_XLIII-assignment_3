@@ -1,6 +1,9 @@
 import os
 import sys
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 """
 Submission script for the Robustness task.
@@ -46,9 +49,9 @@ Your submission will fail if:
 """
 
 BASE_URL = "http://34.63.153.158"
-API_KEY = "YOUR_API_KEY_HERE"  # replace with your actual API key
+API_KEY = os.getenv("API_KEY")  # replace with your actual API key
 
-MODEL_PATH = "PATH/TO/YOUR/MODEL.pt"  # replace with your actual model path
+MODEL_PATH = "./model.pt"  # replace with your actual model path
 MODEL_NAME = "resnet18"  # replace with your actual model architecture - resnet18, resnet34, or resnet50
 
 SUBMIT = True  # set to True to enable submission
