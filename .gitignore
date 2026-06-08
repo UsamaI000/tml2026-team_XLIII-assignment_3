@@ -6,6 +6,8 @@ __pycache__/
 # Virtual environments
 .venv/
 venv/
+runs/
+data/
 env/
 submission.csv
 weighted_score_exp.csv

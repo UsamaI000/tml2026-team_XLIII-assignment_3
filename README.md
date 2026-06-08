@@ -1,114 +1,134 @@
-# Assignment 3 - Robustness
+# TML Assignment 3 Robustness - Updated Submission-Compatible Code
 
-Detect whether given suspect models are stolen versions of a target model.
-
-## Overview
-
-This assignment involves analyzing 360 suspect models to determine if they are stolen versions of the target model. Each suspect model needs to be evaluated and assigned a confidence score indicating the likelihood that it's a stolen model.
-
-## Setup
-
-1. Create and activate a virtual environment:
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate  # On Windows
-# or
-source .venv/bin/activate  # On macOS/Linux
-```
-
-2. Install dependencies:
-
-```bash
-pip install torch torchvision pandas numpy scikit-learn requests python-dotenv safetensors
-```
-
-3. Create a `.env` file in the project root and add your API key:
-
-```env
-API_KEY=your_api_key_here
-```
-
-You can copy `env.example` and replace the placeholder value.
-
-## Project Structure
-
-- **`target_model/`**: The target model to compare against
-- **`suspect_models/`**: 360 suspect model files (suspect_000.safetensors to suspect_359.safetensors)
-- **`task_template.py`**: Example code showing how to load models and format submissions
-- **`submission.py`**: Your implementation for the model stealing detection algorithm
-- **`env.example`**: Template for environment variables
-
-## Model Loading
-
-Use the provided example in `task_template.py` to load models from safetensors format:
+This repo matches the task template:
 
 ```python
-from safetensors.torch import load_file
-state_dict = load_file("path/to/model.safetensors", device="cpu")
-model = make_model()
-model.load_state_dict(state_dict, strict=True)
-model.eval()
+images = torch.from_numpy(data["images"]).float() / 255.0
+model = resnet18(weights=None)
+model.fc = nn.Linear(model.fc.in_features, 9)
 ```
 
-## Resources
+Important decisions:
 
-- See `task_template.py` for model loading examples
-- See `submission.py` for submission format requirements and validation rules
-- CIFAR-100 dataset can be automatically downloaded during model evaluation
+- No ImageNet normalization.
+- No dataset mean/std normalization.
+- Default torchvision ResNet stem is kept unchanged.
+- Saved checkpoints are raw `model.state_dict()` only.
+- PGD is generated directly in raw `[0, 1]` image space.
 
-## Reproducing Our Best Leaderboard Result
-
-Follow these exact steps to recreate the submission file that produced our best leaderboard score.
-
-1. Create and activate the virtual environment (Windows example):
+## 1. Inspect dataset
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\activate
+python inspect_npz.py --npz_path data/train.npz
 ```
 
-2. Install required packages:
+## 2. Train clean sanity baseline first
 
-```bash
-pip install torch torchvision pandas numpy scikit-learn requests python-dotenv safetensors
+```powershell
+python train_validate.py `
+  --npz_path data/train.npz `
+  --output_dir runs/clean_resnet18_no_norm `
+  --model_name resnet18 `
+  --epochs 80 `
+  --batch_size 128 `
+  --val_size 0.1 `
+  --lr 0.05 `
+  --weight_decay 5e-4 `
+  --patience 15 `
+  --min_epochs 20 `
+  --clean_acc_floor 0.55
 ```
 
-3. (Optional) Copy the example environment file and set your API key (required for online submission):
+Verify:
 
-```bash
-copy env.example .env
-# edit .env and set API_KEY to your key
+```powershell
+python verify_submission.py `
+  --model_name resnet18 `
+  --checkpoint runs/clean_resnet18_no_norm/best_resnet18_clean_state_dict.pt
 ```
 
-4. Generate the scored functional submission (this reproduces the exact CSV we submitted):
+Submit this clean model once to confirm server clean accuracy passes 50%.
 
-```bash
-python score_functional_features.py \
-	--features outputs_functional/features_train_target_target_aug_n-1_temp2.0_seed42.csv \
-	--variant simple_top5_samewrong \
-	--out_dir outputs_functional_scored
+## 3. Train first mild PGD baseline
+
+This is intentionally mild to keep server clean accuracy above the 50% gate.
+
+```powershell
+python train_pgd.py `
+  --npz_path data/train.npz `
+  --output_dir runs/pgd_resnet18_eps4_adv04 `
+  --model_name resnet18 `
+  --epochs 80 `
+  --batch_size 128 `
+  --val_size 0.1 `
+  --lr 0.05 `
+  --weight_decay 5e-4 `
+  --train_eps 0.015686275 `
+  --train_alpha 0.003921568 `
+  --train_steps 5 `
+  --adv_weight 0.4 `
+  --eval_eps 0.031372549 `
+  --eval_alpha 0.007843137 `
+  --eval_steps 10 `
+  --patience 15 `
+  --min_epochs 20 `
+  --clean_acc_floor 0.60
 ```
 
-This will write two files into `outputs_functional_scored/`:
+Verify:
 
-- `scored_features_train_target_target_aug_n-1_temp2.0_seed42_simple_top5_samewrong.csv` (scored features with diagnostics)
-- `submission_features_train_target_target_aug_n-1_temp2.0_seed42_simple_top5_samewrong.csv` (the final submission file)
-
-5. (Optional) Submit the produced CSV to the server using the provided submit helper:
-
-```bash
-# Ensure .env contains API_KEY
-python submission.py
+```powershell
+python verify_submission.py `
+  --model_name resnet18 `
+  --checkpoint runs/pgd_resnet18_eps4_adv04/best_resnet18_pgd_state_dict.pt
 ```
 
-`submission.py` is pre-configured to upload the file at
-`./outputs_functional_scored/submission_features_train_target_target_aug_n-1_temp2.0_seed42_simple_top5_samewrong.csv`.
+## 4. Stronger PGD variants after the mild version passes
 
-Notes and reproducibility details:
+Balanced:
 
-- The `--variant simple_top5_samewrong` scoring rule (in `score_functional_features.py`) produced the best leaderboard score for our run.
-- The input features file used is `outputs_functional/features_train_target_target_aug_n-1_temp2.0_seed42.csv` (already included in the repository outputs).
-- If you change `--variant` or the features CSV, leaderboard results will differ.
-- Random seeds are not required for the scoring step (it is deterministic given the same features CSV). If you regenerate the features CSV from raw model runs, use seed `42` where applicable to match our preprocessing pipeline.
+```powershell
+python train_pgd.py `
+  --npz_path data/train.npz `
+  --output_dir runs/pgd_resnet18_eps6_adv05 `
+  --model_name resnet18 `
+  --epochs 100 `
+  --batch_size 128 `
+  --val_size 0.1 `
+  --lr 0.05 `
+  --weight_decay 5e-4 `
+  --train_eps 0.023529412 `
+  --train_alpha 0.005882353 `
+  --train_steps 5 `
+  --adv_weight 0.5 `
+  --eval_eps 0.031372549 `
+  --eval_alpha 0.007843137 `
+  --eval_steps 10 `
+  --patience 15 `
+  --min_epochs 20 `
+  --clean_acc_floor 0.60
+```
 
+Stronger:
+
+```powershell
+python train_pgd.py `
+  --npz_path data/train.npz `
+  --output_dir runs/pgd_resnet18_eps8_adv05 `
+  --model_name resnet18 `
+  --epochs 100 `
+  --batch_size 128 `
+  --val_size 0.1 `
+  --lr 0.05 `
+  --weight_decay 5e-4 `
+  --train_eps 0.031372549 `
+  --train_alpha 0.007843137 `
+  --train_steps 5 `
+  --adv_weight 0.5 `
+  --eval_eps 0.031372549 `
+  --eval_alpha 0.007843137 `
+  --eval_steps 10 `
+  --patience 15 `
+  --min_epochs 20 `
+  --clean_acc_floor 0.60
+```
