@@ -2,10 +2,6 @@ import os
 import sys
 import requests
 from dotenv import load_dotenv
-<<<<<<< HEAD
-=======
-
->>>>>>> 4a0ad5e56064932c02804b48edf7fb8483a57d8c
 load_dotenv()
 
 """
@@ -54,13 +50,8 @@ Your submission will fail if:
 BASE_URL = "http://34.63.153.158"
 API_KEY = os.getenv("API_KEY")  # replace with your actual API key
 
-<<<<<<< HEAD
-MODEL_PATH = "./runs/pgd_resnet34_eps4_adv04/best_resnet34_pgd_state_dict.pt"  # replace with your actual model path
+MODEL_PATH = "./runs/pgd_resnet34_eps6_steps7_adv05/best_resnet34_pgd_state_dict.pt"  # replace with your actual model path
 MODEL_NAME = "resnet34"  # replace with your actual model architecture - resnet18, resnet34, or resnet50
-=======
-MODEL_PATH = "./model.pt"  # replace with your actual model path
-MODEL_NAME = "resnet18"  # replace with your actual model architecture - resnet18, resnet34, or resnet50
->>>>>>> 4a0ad5e56064932c02804b48edf7fb8483a57d8c
 
 SUBMIT = True  # set to True to enable submission
 
