@@ -140,7 +140,7 @@ The current best saved run is `runs/pgd_resnet34_eps6_steps7_adv05`. Re-train it
 ```powershell
 python train_pgd.py `
   --npz_path ./data/train.npz `
-  --output_dir runs/pgd_resnet50_eps6_steps7_adv05_long `
+  --output_dir runs/pgd_resnet50_eps6_steps7_adv06_long `
   --model_name resnet50 `
   --epochs 120 `
   --batch_size 128 `
@@ -150,7 +150,7 @@ python train_pgd.py `
   --train_eps 0.023529412 `
   --train_alpha 0.003921568 `
   --train_steps 7 `
-  --adv_weight 0.5 `
+  --adv_weight 0.6 `
   --eval_eps 0.031372549 `
   --eval_alpha 0.007843137 `
   --eval_steps 20 `
