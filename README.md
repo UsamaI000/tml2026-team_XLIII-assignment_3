@@ -140,9 +140,9 @@ The current best saved run is `runs/pgd_resnet34_eps6_steps7_adv05`. Re-train it
 ```powershell
 python train_pgd.py `
   --npz_path ./data/train.npz `
-  --output_dir runs/pgd_resnet34_eps6_steps7_adv05 `
-  --model_name resnet34 `
-  --epochs 100 `
+  --output_dir runs/pgd_resnet50_eps6_steps7_adv05_long `
+  --model_name resnet50 `
+  --epochs 120 `
   --batch_size 128 `
   --val_size 0.1 `
   --lr 0.05 `
@@ -153,10 +153,10 @@ python train_pgd.py `
   --adv_weight 0.5 `
   --eval_eps 0.031372549 `
   --eval_alpha 0.007843137 `
-  --eval_steps 10 `
-  --patience 15 `
-  --min_epochs 20 `
-  --clean_acc_floor 0.58
+  --eval_steps 20 `
+  --patience 25 `
+  --min_epochs 40 `
+  --clean_acc_floor 0.56
 ```
 
 After training, the checkpoint to verify is `runs/pgd_resnet34_eps6_steps7_adv05/best_resnet34_pgd_state_dict.pt`.
