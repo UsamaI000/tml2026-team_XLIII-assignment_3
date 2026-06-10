@@ -135,7 +135,7 @@ python train_pgd.py `
 
 ## 5. Reproduce the current best model
 
-The current best saved run is `runs/pgd_resnet50_eps6_steps7_adv06_long` with `0.559730` score on leaderboard. Re-train it with:
+The current best saved run is `runs/pgd_resnet50_eps6_steps7_adv06_epochs150` with `0.565537` score on leaderboard. Re-train it with:
 
 ```powershell
 python train_pgd.py `
