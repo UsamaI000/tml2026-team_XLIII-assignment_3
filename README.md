@@ -140,9 +140,9 @@ The current best saved run is `runs/pgd_resnet50_eps6_steps7_adv06_long` with `0
 ```powershell
 python train_pgd.py `
   --npz_path ./data/train.npz `
-  --output_dir runs/pgd_resnet50_eps6_steps7_adv06_long `
+  --output_dir runs/pgd_resnet50_eps6_steps7_adv06_epochs150 `
   --model_name resnet50 `
-  --epochs 120 `
+  --epochs 150 `
   --batch_size 128 `
   --val_size 0.1 `
   --lr 0.05 `
