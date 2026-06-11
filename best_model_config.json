@@ -1,6 +1,6 @@
 {
   "npz_path": "/home/atml_team040/tml2026-team_XLIII-assignment_3/train.npz",
-  "output_dir": "/home/atml_team040/tml2026-team_XLIII-assignment_3/runs/pgd_resnet50_eps6_steps7_adv06_epochs150",
+  "output_dir": "/home/atml_team040/tml2026-team_XLIII-assignment_3/runs/pgd_resnet50_eps6_steps7_adv06_ema",
   "model_name": "resnet50",
   "epochs": 150,
   "batch_size": 128,
@@ -22,5 +22,7 @@
   "eval_max_batches": null,
   "patience": 25,
   "min_epochs": 40,
-  "clean_acc_floor": 0.56
+  "clean_acc_floor": 0.56,
+  "use_ema": true,
+  "ema_decay": 0.999
 }
