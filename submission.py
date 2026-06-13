@@ -50,7 +50,11 @@ Your submission will fail if:
 BASE_URL = "http://34.63.153.158"
 API_KEY = os.getenv("API_KEY")  # replace with your actual API key
 
+<<<<<<< HEAD
 MODEL_PATH = "./runs/pgd_resnet50_eps6_steps7_adv055_ema_200/best_resnet50_pgd_ema_state_dict.pt"  # replace with your actual model path
+=======
+MODEL_PATH = "./runs/pgd_resnet50_eps6_steps7_adv06_ema09995_150/best_resnet50_pgd_ema_state_dict.pt"  # replace with your actual model path
+>>>>>>> e695acb94cad5d009e7ffacdf343fa906d12d8d5
 MODEL_NAME = "resnet50"  # replace with your actual model architecture - resnet18, resnet34, or resnet50
 
 SUBMIT = True  # set to True to enable submission
