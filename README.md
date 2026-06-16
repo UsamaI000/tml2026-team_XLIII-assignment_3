@@ -135,7 +135,7 @@ python train_pgd.py `
 
 ## 5. Reproduce the current best model
 
-The current best saved run is `runs/pgd_resnet50_eps6_steps7_adv06_epochs150` with `0.565537` score on leaderboard. Re-train it with:
+The current best saved run is `runs/pgd_resnet50_eps6_steps7_adv06_epochs200_seed20` with `0.587303` score on leaderboard. Re-train it with:
 
 ```powershell
 python train_pgd.py `
@@ -157,9 +157,7 @@ python train_pgd.py `
   --eval_steps 20 `
   --patience 25 `
   --min_epochs 40 `
-  --clean_acc_floor 0.56 `
-  --use_ema `
-  --ema_decay 0.999
+  --clean_acc_floor 0.56
 ```
 
-After training, the checkpoint to verify is `runs/pgd_resnet50_eps6_steps7_adv06_epochs200_seed20/best_resnet50_pgd_ema_state_dict.pt`.
+After training, the checkpoint to verify is `runs/pgd_resnet50_eps6_steps7_adv06_epochs200_seed20/best_resnet50_pgd_state_dict.pt`.
