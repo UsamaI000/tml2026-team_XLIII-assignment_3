@@ -1,4 +1,9 @@
-# TML Assignment 3 Robustness - Updated Submission-Compatible Code
+# TML Assignment 3 - Robustness
+
+Train an image classifier that is robust against adversarial attacks
+
+## Overview
+This assignment invloves training a robust classifier that maintains high accuracy on both clean and adversarially perturbed inputs.
 
 This repo matches the task template:
 
@@ -16,126 +21,65 @@ Important decisions:
 - Saved checkpoints are raw `model.state_dict()` only.
 - PGD is generated directly in raw `[0, 1]` image space.
 
-## 1. Inspect dataset
 
-```powershell
-python inspect_npz.py --npz_path data/train.npz
+## Setup
+
+1. Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate  # On Windows
+# or
+source .venv/bin/activate  # On macOS/Linux
 ```
 
-## 2. Train clean sanity baseline first
+2. Install dependencies:
 
-```powershell
-python train_validate.py `
-  --npz_path data/train.npz `
-  --output_dir runs/clean_resnet18_no_norm `
-  --model_name resnet18 `
-  --epochs 80 `
-  --batch_size 128 `
-  --val_size 0.1 `
-  --lr 0.05 `
-  --weight_decay 5e-4 `
-  --patience 15 `
-  --min_epochs 20 `
-  --clean_acc_floor 0.55
+```bash
+pip install torch torchvision pandas numpy scikit-learn requests python-dotenv safetensors
 ```
 
-Verify:
+3. Create a `.env` file in the project root and add your API key:
 
-```powershell
-python verify_submission.py `
-  --model_name resnet18 `
-  --checkpoint runs/clean_resnet18_no_norm/best_resnet18_clean_state_dict.pt
+```env
+API_KEY=your_api_key_here
 ```
 
-Submit this clean model once to confirm server clean accuracy passes 50%.
+You can copy `env.example` and replace the placeholder value.
 
-## 3. Train first mild PGD baseline
+## Project Structure
+- **`data/`**: The given training dataset of 50,000 labeled images of shape 3x32x32 across 9 classes
+- **`runs/`**: Saves the history for each epoch, final model state dict, summary and config 
+- **`task_template.py`**: Example code showing how to train models
+- **`submission.py`**: File to submit the robust model.pt to leaderboard
+- **`env.example`**: Template for environment variables
 
-This is intentionally mild to keep server clean accuracy above the 50% gate.
 
-```powershell
-python train_pgd.py `
-  --npz_path data/train.npz `
-  --output_dir runs/pgd_resnet18_eps4_adv04 `
-  --model_name resnet18 `
-  --epochs 80 `
-  --batch_size 128 `
-  --val_size 0.1 `
-  --lr 0.05 `
-  --weight_decay 5e-4 `
-  --train_eps 0.015686275 `
-  --train_alpha 0.003921568 `
-  --train_steps 5 `
-  --adv_weight 0.4 `
-  --eval_eps 0.031372549 `
-  --eval_alpha 0.007843137 `
-  --eval_steps 10 `
-  --patience 15 `
-  --min_epochs 20 `
-  --clean_acc_floor 0.60
-```
+## Reproducing Our Best Leaderboard Result
+Follow these exact steps to recreate the submission file that produced our best leaderboard score.
 
-Verify:
+1. Create and activate the virtual environment (Windows example):
 
 ```powershell
-python verify_submission.py `
-  --model_name resnet18 `
-  --checkpoint runs/pgd_resnet18_eps4_adv04/best_resnet18_pgd_state_dict.pt
+python -m venv .venv
+.venv\Scripts\activate
 ```
 
-## 4. Stronger PGD variants after the mild version passes
+2. Install required packages:
 
-Balanced:
-
-```powershell
-python train_pgd.py `
-  --npz_path data/train.npz `
-  --output_dir runs/pgd_resnet18_eps6_adv05 `
-  --model_name resnet18 `
-  --epochs 100 `
-  --batch_size 128 `
-  --val_size 0.1 `
-  --lr 0.05 `
-  --weight_decay 5e-4 `
-  --train_eps 0.023529412 `
-  --train_alpha 0.005882353 `
-  --train_steps 5 `
-  --adv_weight 0.5 `
-  --eval_eps 0.031372549 `
-  --eval_alpha 0.007843137 `
-  --eval_steps 10 `
-  --patience 15 `
-  --min_epochs 20 `
-  --clean_acc_floor 0.60
+```bash
+pip install torch torchvision pandas numpy scikit-learn requests python-dotenv safetensors
 ```
 
-Stronger:
+3. (Optional) Copy the example environment file and set your API key (required for online submission):
 
-```powershell
-python train_pgd.py `
-  --npz_path data/train.npz `
-  --output_dir runs/pgd_resnet18_eps8_adv05 `
-  --model_name resnet18 `
-  --epochs 100 `
-  --batch_size 128 `
-  --val_size 0.1 `
-  --lr 0.05 `
-  --weight_decay 5e-4 `
-  --train_eps 0.031372549 `
-  --train_alpha 0.007843137 `
-  --train_steps 5 `
-  --adv_weight 0.5 `
-  --eval_eps 0.031372549 `
-  --eval_alpha 0.007843137 `
-  --eval_steps 10 `
-  --patience 15 `
-  --min_epochs 20 `
-  --clean_acc_floor 0.60
+```bash
+copy env.example .env
+# edit .env and set API_KEY to your key
 ```
 
-## 5. Reproduce the current best model
-
-The current best saved run is `runs/pgd_resnet50_eps6_steps7_adv06_epochs200_seed20` with `0.587303` score on leaderboard. Re-train it with:
+4. Train the robust model:
+The best saved run is `runs/pgd_resnet50_eps6_steps7_adv06_epochs200_seed20` with `0.587303` score on leaderboard. Re-train it with:
 
 ```powershell
 python train_pgd.py `
@@ -161,3 +105,12 @@ python train_pgd.py `
 ```
 
 After training, the checkpoint to verify is `runs/pgd_resnet50_eps6_steps7_adv06_epochs200_seed20/best_resnet50_pgd_state_dict.pt`.
+
+5. (Optional) Submit the model to the server using the provided submit helper:
+
+```bash
+# Ensure .env contains API_KEY
+python submission.py
+```
+
+`submission.py` is pre-configured to upload the file at  `runs/pgd_resnet50_eps6_steps7_adv06_epochs200_seed20/best_resnet50_pgd_state_dict.pt`.
